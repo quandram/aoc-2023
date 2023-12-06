@@ -67,3 +67,19 @@ const games: Array<ElfGame> = data.map((x) => {
 
 const part1MatchingGames = filterGames(games, [12, 13, 14]);
 console.log(`part 1: ${part1MatchingGames.reduce((p, c) => p + c.id, 0)}`);
+
+const minimumBalls: Array<ElfGameSet> = games.map((x) => {
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  x.sets.map((x) => {
+    r = x.red > r ? x.red : r;
+    g = x.green > g ? x.green : g;
+    b = x.blue > b ? x.blue : b;
+  });
+  return new ElfGameSet(r, g, b);
+});
+
+console.log(
+  `part 2: ${minimumBalls.reduce((p, c) => p + c.red * c.green * c.blue, 0)}`,
+);
