@@ -9,14 +9,18 @@ class Scratch {
   id: number;
   scratchNumbers: Array<number>;
   winningNumbers: Array<number>;
+  instances: number;
 
   matchingNumbers = () =>
     this.scratchNumbers.filter((x) => this.winningNumbers.includes(x));
+
+  matchingNumbersCount = () => this.matchingNumbers().length;
 
   constructor(id: number, s: Array<number>, w: Array<number>) {
     this.id = id;
     this.scratchNumbers = s;
     this.winningNumbers = w;
+    this.instances = 1;
   }
 }
 
@@ -36,6 +40,17 @@ const cards = data.map((x) => {
   );
 });
 
+cards.map((x, i) => {
+  for (let j = 0; j < x.instances; j++) {
+    for (let k = 0; k < x.matchingNumbersCount(); k++) {
+      const cardIndexToUpdate = i + k + 1;
+      if (cardIndexToUpdate < cards.length) {
+        cards[cardIndexToUpdate].instances++;
+      }
+    }
+  }
+});
+
 console.log(
   `part 1: ${cards
     .map((x) =>
@@ -43,6 +58,8 @@ console.log(
     )
     .reduce((p, c) => p + c, 0)}`,
 );
+
+console.log(`part 2: ${cards.reduce((p, c) => p + c.instances, 0)}`);
 /*
 console.log(cards);
 console.log(cards.at(-1)?.id);
