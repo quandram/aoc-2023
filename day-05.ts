@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 
-const debug = false;
+const debug = true;
 const fileName = `day-05${debug ? ".test" : ".input"}`;
 
 const data: Array<string> = readFileSync(fileName, "utf8").trim().split(/\n/);
@@ -55,11 +55,23 @@ function readInput() {
   let section: string = "";
   data.forEach((x, i) => {
     if (i === 0) {
-      seeds = x
+      // part 1
+      /*  seeds = x
         .split(/:/)[1]
         .trim()
         .split(/ /)
         .map((y) => new Seed(+y.trim()));
+      */
+      // part 2
+      const seedInput = x.split(/:/)[1].trim().split(/ /);
+      console.log(seedInput);
+      for (let i = 0; i < seedInput.length; i = i + 2) {
+          for(let j = 0; j < +seedInput[i+1]; j++) {
+            console.log(i);
+            console.log(j);
+            seeds.push(new Seed(+seedInput[i] + j));
+          }
+      }
       return;
     }
     switch (x.trim()) {
