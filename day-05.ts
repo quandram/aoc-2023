@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 
-const debug = true;
+const debug = false;
 const fileName = `day-05${debug ? ".test" : ".input"}`;
 
 const data: Array<string> = readFileSync(fileName, "utf8").trim().split(/\n/);
@@ -41,105 +41,90 @@ const getNumber = (input: number, maps: Array<AlmanacMap>) => {
     : input + (validMap[0].destination - validMap[0].source);
 };
 
-const seedToSoil: Array<AlmanacMap> = [];
-const soilToFertilizer: Array<AlmanacMap> = [];
-const fertilizerToWater: Array<AlmanacMap> = [];
-const waterToLight: Array<AlmanacMap> = [];
-const lightToTemperature: Array<AlmanacMap> = [];
-const temperatureToHumidity: Array<AlmanacMap> = [];
-const humidityToLocation: Array<AlmanacMap> = [];
+const getNumberReverse = (input: number, maps: Array<AlmanacMap>) => {
+  const validMap = maps.filter(
+    (x) => input >= x.destination && input <= x.destination + x.range,
+  );
+  return validMap.length === 0
+    ? input
+    : input + (validMap[0].source - validMap[0].destination);
+}
+const gardenMaps: Array<Array<AlmanacMap>> = [];
 
 let seeds: Array<Seed> = [];
-
+const seedRange: Array<Array<number>> = [];
 function readInput() {
-  let section: string = "";
+  let mapSection: number = -1;
   data.forEach((x, i) => {
     if (i === 0) {
       // part 1
-      /*  seeds = x
+        seeds = x
         .split(/:/)[1]
         .trim()
         .split(/ /)
         .map((y) => new Seed(+y.trim()));
-      */
+      
       // part 2
+      
       const seedInput = x.split(/:/)[1].trim().split(/ /);
-      console.log(seedInput);
       for (let i = 0; i < seedInput.length; i = i + 2) {
-          for(let j = 0; j < +seedInput[i+1]; j++) {
-            console.log(i);
-            console.log(j);
-            seeds.push(new Seed(+seedInput[i] + j));
-          }
+        seedRange.push([+seedInput[i], +seedInput[i] + +seedInput[i + 1]]);
       }
       return;
     }
     switch (x.trim()) {
       case "":
-        break;
+        return;
       case "seed-to-soil map:":
-        section = "soil";
-        break;
       case "soil-to-fertilizer map:":
-        section = "fertilizer";
-        break;
       case "fertilizer-to-water map:":
-        section = "water";
-        break;
       case "water-to-light map:":
-        section = "light";
-        break;
       case "light-to-temperature map:":
-        section = "temperature";
-        break;
       case "temperature-to-humidity map:":
-        section = "humidity";
-        break;
       case "humidity-to-location map:":
-        section = "location";
+        gardenMaps.push([]);
+        mapSection++;
         break;
       default:
-        switch (section) {
-          case "soil":
-            seedToSoil.push(new AlmanacMap(x));
-            break;
-          case "fertilizer":
-            soilToFertilizer.push(new AlmanacMap(x));
-            break;
-          case "water":
-            fertilizerToWater.push(new AlmanacMap(x));
-            break;
-          case "light":
-            waterToLight.push(new AlmanacMap(x));
-            break;
-          case "temperature":
-            lightToTemperature.push(new AlmanacMap(x));
-            break;
-          case "humidity":
-            temperatureToHumidity.push(new AlmanacMap(x));
-            break;
-          case "location":
-            humidityToLocation.push(new AlmanacMap(x));
-            break;
-        }
+        gardenMaps[mapSection].push(new AlmanacMap(x));
         break;
     }
   });
 }
 
 readInput();
+
 seeds.forEach((x) => {
-  x.soil = getNumber(x.seed, seedToSoil);
-  x.fertilizer = getNumber(x.soil, soilToFertilizer);
-  x.water = getNumber(x.fertilizer, fertilizerToWater);
-  x.light = getNumber(x.water, waterToLight);
-  x.temperature = getNumber(x.light, lightToTemperature);
-  x.humidity = getNumber(x.temperature, temperatureToHumidity);
-  x.location = getNumber(x.humidity, humidityToLocation);
+  x.soil = getNumber(x.seed, gardenMaps[0]);
+  x.fertilizer = getNumber(x.soil, gardenMaps[1]);
+  x.water = getNumber(x.fertilizer, gardenMaps[2]);
+  x.light = getNumber(x.water, gardenMaps[3]);
+  x.temperature = getNumber(x.light, gardenMaps[4]);
+  x.humidity = getNumber(x.temperature, gardenMaps[5]);
+  x.location = getNumber(x.humidity, gardenMaps[6]);
 });
+
+
+function getSeedByLocation(location: number): number {
+    return gardenMaps.slice().reverse().reduce((p, c) => {
+       return getNumberReverse(p, c);
+    }, location);
+}
+
 console.log(
   `Part 1: ${seeds.reduce(
     (p, c) => (p = p === 0 || p > c.location ? c.location : p),
     0,
   )}`,
 );
+
+for (let i = 0; ; i++) {
+    const seed = seedRange.find(x => {
+        const seedId = getSeedByLocation(i);
+        return seedId >= x[0] && seedId <= x[1];
+    });
+    if (typeof(seed) !== "undefined") {
+        console.log(`Part 2: ${i}`);
+        break;
+    }
+}
