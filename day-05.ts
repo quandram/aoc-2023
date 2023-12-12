@@ -48,7 +48,7 @@ const getNumberReverse = (input: number, maps: Array<AlmanacMap>) => {
   return validMap.length === 0
     ? input
     : input + (validMap[0].source - validMap[0].destination);
-}
+};
 const gardenMaps: Array<Array<AlmanacMap>> = [];
 
 let seeds: Array<Seed> = [];
@@ -58,14 +58,14 @@ function readInput() {
   data.forEach((x, i) => {
     if (i === 0) {
       // part 1
-        seeds = x
+      seeds = x
         .split(/:/)[1]
         .trim()
         .split(/ /)
         .map((y) => new Seed(+y.trim()));
-      
+
       // part 2
-      
+
       const seedInput = x.split(/:/)[1].trim().split(/ /);
       for (let i = 0; i < seedInput.length; i = i + 2) {
         seedRange.push([+seedInput[i], +seedInput[i] + +seedInput[i + 1]]);
@@ -104,10 +104,12 @@ seeds.forEach((x) => {
   x.location = getNumber(x.humidity, gardenMaps[6]);
 });
 
-
 function getSeedByLocation(location: number): number {
-    return gardenMaps.slice().reverse().reduce((p, c) => {
-       return getNumberReverse(p, c);
+  return gardenMaps
+    .slice()
+    .reverse()
+    .reduce((p, c) => {
+      return getNumberReverse(p, c);
     }, location);
 }
 
@@ -119,12 +121,12 @@ console.log(
 );
 
 for (let i = 0; ; i++) {
-    const seed = seedRange.find(x => {
-        const seedId = getSeedByLocation(i);
-        return seedId >= x[0] && seedId <= x[1];
-    });
-    if (typeof(seed) !== "undefined") {
-        console.log(`Part 2: ${i}`);
-        break;
-    }
+  const seed = seedRange.find((x) => {
+    const seedId = getSeedByLocation(i);
+    return seedId >= x[0] && seedId <= x[1];
+  });
+  if (typeof seed !== "undefined") {
+    console.log(`Part 2: ${i}`);
+    break;
+  }
 }
